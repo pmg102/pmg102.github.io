@@ -42,9 +42,9 @@ export default class Sprite {
       });
   }
 
-  render(ctx, dt) {
+  render(ctx) {
     ctx.fillStyle = this.color;
-    ctx.fillRect(this.x + (this.dx * dt), this.y + (this.dy * dt), this.width, this.height);
+    ctx.fillRect(this.x, this.y, this.width, this.height);
   }
 
   collideWith(other) {
