@@ -1,19 +1,17 @@
 import { timestamp } from './utils';
 
-const fps  = 60,
-  STEP     = 1/fps;
-
 export default class Animator {
-  constructor(canvas, objects) {
+  constructor(canvas, objects, viewport) {
     this.sprites = objects;
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
+    this.viewport = viewport;
 
     this.fpsmeter = new FPSMeter({ decimals: 0, graph: true, theme: 'dark', left: '5px' });
   }
 
-  update() {
-    this.sprites.forEach(each => each.update(this.dt));
+  update(dt) {
+    this.sprites.forEach(each => each.update(dt));
   }
 
   clearCanvas() {
@@ -21,7 +19,10 @@ export default class Animator {
   }
 
   render() {
+    this.ctx.restore();
     this.clearCanvas();
+    this.ctx.save();
+    this.viewport.applyTo(this.ctx);
     this.sprites.forEach(each => each.render(this.ctx, this.dt));
   }
 
@@ -29,11 +30,7 @@ export default class Animator {
     if (!this.running) return;
     this.fpsmeter.tickStart();
     this.now = timestamp();
-    this.dt = this.dt + Math.min(1, (this.now - this.last) / 1000);
-    while(this.dt > STEP) {
-      this.dt -= STEP;
-      this.update(STEP);
-    }
+    this.update(Math.min(1, (this.now - this.last) / 1000));
     this.render();
     this.last = this.now;
     this.fpsmeter.tick();
@@ -46,7 +43,6 @@ export default class Animator {
 
   start() {
     this.running = true;
-    this.dt = 0;
     this.last = this.now = timestamp();
     this.frame();
   }
