@@ -11,27 +11,23 @@ var _utils = require('./utils');
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var fps = 60,
-    STEP = 1 / fps;
-
 var Animator = function () {
-  function Animator(canvas, objects) {
+  function Animator(canvas, objects, viewport) {
     _classCallCheck(this, Animator);
 
     this.sprites = objects;
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
+    this.viewport = viewport;
 
     this.fpsmeter = new FPSMeter({ decimals: 0, graph: true, theme: 'dark', left: '5px' });
   }
 
   _createClass(Animator, [{
     key: 'update',
-    value: function update() {
-      var _this = this;
-
+    value: function update(dt) {
       this.sprites.forEach(function (each) {
-        return each.update(_this.dt);
+        return each.update(dt);
       });
     }
   }, {
@@ -42,31 +38,30 @@ var Animator = function () {
   }, {
     key: 'render',
     value: function render() {
-      var _this2 = this;
+      var _this = this;
 
+      this.ctx.restore();
       this.clearCanvas();
+      this.ctx.save();
+      this.viewport.applyTo(this.ctx);
       this.sprites.forEach(function (each) {
-        return each.render(_this2.ctx, _this2.dt);
+        return each.render(_this.ctx, _this.dt);
       });
     }
   }, {
     key: 'frame',
     value: function frame() {
-      var _this3 = this;
+      var _this2 = this;
 
       if (!this.running) return;
       this.fpsmeter.tickStart();
       this.now = (0, _utils.timestamp)();
-      this.dt = this.dt + Math.min(1, (this.now - this.last) / 1000);
-      while (this.dt > STEP) {
-        this.dt -= STEP;
-        this.update(STEP);
-      }
+      this.update(Math.min(1, (this.now - this.last) / 1000));
       this.render();
       this.last = this.now;
       this.fpsmeter.tick();
       requestAnimationFrame(function () {
-        return _this3.frame();
+        return _this2.frame();
       }, this.canvas);
     }
   }, {
@@ -78,7 +73,6 @@ var Animator = function () {
     key: 'start',
     value: function start() {
       this.running = true;
-      this.dt = 0;
       this.last = this.now = (0, _utils.timestamp)();
       this.frame();
     }
@@ -89,7 +83,7 @@ var Animator = function () {
 
 exports.default = Animator;
 
-},{"./utils":6}],2:[function(require,module,exports){
+},{"./utils":7}],2:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -234,9 +228,9 @@ var Sprite = function () {
     }
   }, {
     key: 'render',
-    value: function render(ctx, dt) {
+    value: function render(ctx) {
       ctx.fillStyle = this.color;
-      ctx.fillRect(this.x + this.dx * dt, this.y + this.dy * dt, this.width, this.height);
+      ctx.fillRect(this.x, this.y, this.width, this.height);
     }
   }, {
     key: 'collideWith',
@@ -253,6 +247,73 @@ exports.default = Sprite;
 Sprite.objects = [];
 
 },{}],5:[function(require,module,exports){
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Viewport = function () {
+  function Viewport(w, h, player, canvas) {
+    _classCallCheck(this, Viewport);
+
+    this.w = w;
+    this.h = h;
+    this.player = player;
+    this.x = 0;
+    this.y = 0;
+    this.player0 = {
+      x: this.player.x,
+      y: this.player.y
+    };
+  }
+
+  _createClass(Viewport, [{
+    key: "constrainX",
+    value: function constrainX(dx) {
+      var half = canvas.width / 2;
+      var _dx = dx + this.player0.x;
+
+      if (_dx < half) {
+        return 0;
+      } else if (_dx > this.w - half) {
+        return this.w - canvas.width;
+      } else {
+        return _dx - half;
+      }
+    }
+  }, {
+    key: "constrainY",
+    value: function constrainY(dy) {
+      var half = canvas.height / 2;
+      var _dy = dy + this.player0.y;
+
+      if (_dy > this.h - half) {
+        return this.h - canvas.height;
+      } else {
+        return _dy - half;
+      }
+    }
+  }, {
+    key: "applyTo",
+    value: function applyTo(ctx) {
+      var dx = this.constrainX(this.player.x - this.player0.x);
+      var dy = this.constrainY(this.player.y - this.player0.y);
+
+      ctx.translate(-dx, -dy);
+    }
+  }]);
+
+  return Viewport;
+}();
+
+exports.default = Viewport;
+
+},{}],6:[function(require,module,exports){
 'use strict';
 
 var _Sprite = require('./Sprite');
@@ -262,6 +323,10 @@ var _Sprite2 = _interopRequireDefault(_Sprite);
 var _Player = require('./Player');
 
 var _Player2 = _interopRequireDefault(_Player);
+
+var _Viewport = require('./Viewport');
+
+var _Viewport2 = _interopRequireDefault(_Viewport);
 
 var _Land = require('./Land');
 
@@ -279,10 +344,13 @@ canvas.height = canvas.offsetHeight;
 
 var player = new _Player2.default({ x: 100, y: 500, width: 20, height: 20, color: '#a04' });
 
-new _Land2.default({ x: 0, y: 520, width: 768, height: 576, color: '#4a0' });
-new _Land2.default({ x: 200, y: 300, width: 100, height: 30, color: '#4a0' });
+var viewport = new _Viewport2.default(1536, 576, player, canvas);
 
-var animator = new _Animator2.default(canvas, _Sprite2.default.objects);
+new _Land2.default({ x: 0, y: 520, width: 1536, height: 576, color: '#4a0' });
+new _Land2.default({ x: 200, y: 300, width: 100, height: 30, color: '#4a0' });
+new _Land2.default({ x: 1000, y: 100, width: 100, height: 30, color: '#4a0' });
+
+var animator = new _Animator2.default(canvas, _Sprite2.default.objects, viewport);
 animator.start();
 
 document.addEventListener('keydown', function (ev) {
@@ -298,9 +366,9 @@ function onkey(ev, key, down) {
   console.log(key);
   switch (key) {
     case KEY.LEFT:
-      player.dx = down ? -200 : 0;ev.preventDefault();return false;
+      player.dx = down ? -500 : 0;ev.preventDefault();return false;
     case KEY.RIGHT:
-      player.dx = down ? 200 : 0;ev.preventDefault();return false;
+      player.dx = down ? 500 : 0;ev.preventDefault();return false;
     case KEY.SPACE:
       if (down) player.dy = -1000;player.ddy = 2000;ev.preventDefault();return false;
     case KEY.ENTER:
@@ -310,7 +378,7 @@ function onkey(ev, key, down) {
   }
 }
 
-},{"./Animator":1,"./Land":2,"./Player":3,"./Sprite":4}],6:[function(require,module,exports){
+},{"./Animator":1,"./Land":2,"./Player":3,"./Sprite":4,"./Viewport":5}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -321,4 +389,4 @@ function timestamp() {
   return window.performance && window.performance.now ? window.performance.now() : new Date().getTime();
 }
 
-},{}]},{},[5]);
+},{}]},{},[6]);
