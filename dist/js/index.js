@@ -366,11 +366,21 @@ function onkey(ev, key, down) {
   console.log(key);
   switch (key) {
     case KEY.LEFT:
-      player.dx = down ? -500 : 0;ev.preventDefault();return false;
+      if (down) {
+        player.dx = player.dx > 0 ? 0 : -500;
+      }
+      else {
+        player.dx = player.dx < 0 ? 0 : 500;
+      }
     case KEY.RIGHT:
-      player.dx = down ? 500 : 0;ev.preventDefault();return false;
+      if (down) {
+        player.dx = player.dx < 0 ? 0 : 500;
+      }
+      else {
+        player.dx = player.dx > 0 ? 0 : -500;
+      }
     case KEY.SPACE:
-      if (down) player.dy = -1000;player.ddy = 2000;ev.preventDefault();return false;
+      if (down) player.dy = -1000;player.ddy = 2000;return false;
     case KEY.ENTER:
       if (down) {
         animator.running ? animator.stop() : animator.start();
