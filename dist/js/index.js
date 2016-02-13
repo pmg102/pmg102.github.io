@@ -372,6 +372,18 @@ document.getElementById('right').addEventListener('mousedown', function (ev) {
 document.getElementById('right').addEventListener('mouseup', function (ev) {
   return onkey(ev, KEY.RIGHT, false);
 }, false);
+document.getElementById('left').addEventListener('touchstart', function (ev) {
+  return onkey(ev, KEY.LEFT, true);
+}, false);
+document.getElementById('left').addEventListener('touchend', function (ev) {
+  return onkey(ev, KEY.LEFT, false);
+}, false);
+document.getElementById('right').addEventListener('touchstart', function (ev) {
+  return onkey(ev, KEY.RIGHT, true);
+}, false);
+document.getElementById('right').addEventListener('touchend', function (ev) {
+  return onkey(ev, KEY.RIGHT, false);
+}, false);
 
 var KEY = { ENTER: 13, SPACE: 32, LEFT: 37, UP: 38, RIGHT: 39, DOWN: 40 };
 

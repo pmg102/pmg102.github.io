@@ -27,6 +27,10 @@ document.getElementById('left').addEventListener('mousedown', ev => onkey(ev, KE
 document.getElementById('left').addEventListener('mouseup', ev => onkey(ev, KEY.LEFT, false), false);
 document.getElementById('right').addEventListener('mousedown', ev => onkey(ev, KEY.RIGHT, true), false);
 document.getElementById('right').addEventListener('mouseup', ev => onkey(ev, KEY.RIGHT, false), false);
+document.getElementById('left').addEventListener('touchstart', ev => onkey(ev, KEY.LEFT, true), false);
+document.getElementById('left').addEventListener('touchend', ev => onkey(ev, KEY.LEFT, false), false);
+document.getElementById('right').addEventListener('touchstart', ev => onkey(ev, KEY.RIGHT, true), false);
+document.getElementById('right').addEventListener('touchend', ev => onkey(ev, KEY.RIGHT, false), false);
 
 const KEY      = { ENTER: 13, SPACE: 32, LEFT: 37, UP: 38, RIGHT: 39, DOWN: 40 };
 
