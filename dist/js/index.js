@@ -354,10 +354,10 @@ var animator = new _Animator2.default(canvas, _Sprite2.default.objects, viewport
 animator.start();
 
 document.addEventListener('keydown', function (ev) {
-  return onkey(ev, ev.keyCode, true);
+  onkey(ev, ev.keyCode, true);
 }, false);
 document.addEventListener('keyup', function (ev) {
-  return onkey(ev, ev.keyCode, false);
+  onkey(ev, ev.keyCode, false);
 }, false);
 
 var KEY = { ENTER: 13, SPACE: 32, LEFT: 37, UP: 38, RIGHT: 39, DOWN: 40 };
@@ -368,25 +368,27 @@ function onkey(ev, key, down) {
     case KEY.LEFT:
       if (down) {
         player.dx = player.dx > 0 ? 0 : -500;
-      }
-      else {
+      } else {
         player.dx = player.dx < 0 ? 0 : 500;
       }
       return;
     case KEY.RIGHT:
       if (down) {
         player.dx = player.dx < 0 ? 0 : 500;
-      }
-      else {
+      } else {
         player.dx = player.dx > 0 ? 0 : -500;
       }
       return;
     case KEY.SPACE:
-      if (down) player.dy = -1000;player.ddy = 2000;return false;
+      if (down) player.dy = -1000;
+      player.ddy = 2000;
+      return;
+
     case KEY.ENTER:
       if (down) {
         animator.running ? animator.stop() : animator.start();
-      }ev.preventDefault();return false;
+      }
+      return;
   }
 }
 

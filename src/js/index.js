@@ -20,17 +20,39 @@ new Land({x: 1000, y: 100, width: 100, height: 30, color: '#4a0'});
 const animator = new Animator(canvas, Sprite.objects, viewport);
 animator.start();
 
-document.addEventListener('keydown', function(ev) { return onkey(ev, ev.keyCode, true);  }, false);
-document.addEventListener('keyup',   function(ev) { return onkey(ev, ev.keyCode, false); }, false);
+document.addEventListener('keydown', function(ev) { onkey(ev, ev.keyCode, true);  }, false);
+document.addEventListener('keyup',   function(ev) { onkey(ev, ev.keyCode, false); }, false);
 
 const KEY      = { ENTER: 13, SPACE: 32, LEFT: 37, UP: 38, RIGHT: 39, DOWN: 40 };
 
 function onkey(ev, key, down) {
   console.log(key);
   switch(key) {
-    case KEY.LEFT:  player.dx = down ? -500 : 0; ev.preventDefault(); return false;
-    case KEY.RIGHT: player.dx = down ? 500 : 0; ev.preventDefault(); return false;
-    case KEY.SPACE: if (down) player.dy = -1000; player.ddy = 2000; ev.preventDefault(); return false;
-    case KEY.ENTER: if (down) { animator.running ? animator.stop() : animator.start(); } ev.preventDefault(); return false;
+    case KEY.LEFT:
+      if (down) {
+        player.dx = player.dx > 0 ? 0 : -500;
+      }
+      else {
+        player.dx = player.dx < 0 ? 0 : 500;
+      }
+      return;
+    case KEY.RIGHT:
+      if (down) {
+        player.dx = player.dx < 0 ? 0 : 500;
+      }
+      else {
+        player.dx = player.dx > 0 ? 0 : -500;
+      }
+      return;
+    case KEY.SPACE:
+      if (down) player.dy = -1000;
+      player.ddy = 2000;
+      return;
+
+    case KEY.ENTER:
+      if (down) {
+        animator.running ? animator.stop() : animator.start();
+      }
+      return;
   }
 }
