@@ -372,6 +372,7 @@ function onkey(ev, key, down) {
       else {
         player.dx = player.dx < 0 ? 0 : 500;
       }
+      return;
     case KEY.RIGHT:
       if (down) {
         player.dx = player.dx < 0 ? 0 : 500;
@@ -379,6 +380,7 @@ function onkey(ev, key, down) {
       else {
         player.dx = player.dx > 0 ? 0 : -500;
       }
+      return;
     case KEY.SPACE:
       if (down) player.dy = -1000;player.ddy = 2000;return false;
     case KEY.ENTER:
