@@ -1,4 +1,5 @@
 import png
+import string
 
 # Read in a png
 # Split into cells 8x8
@@ -64,13 +65,21 @@ for row in pixels:
 	cells_rows.append(cells_row)
 	cells_row = []
 
-f = open('out/sprites.png', 'wb')      # binary mode is important
+f = open('sprites.png', 'wb')      # binary mode is important
 w = png.Writer(CELL_SIZE, CELL_SIZE * len(sprites), greyscale=True)
 w.write(f, [row for sprite in sprites for row in sprite])
 f.close()
 
-f = open('out/grid.json', 'w')
-f.write(str(grid))
+chars = string.digits + string.ascii_letters
+
+f = open('grid.json', 'w')
+f.write('[\n')
+for row in grid:
+	f.write('  "')
+	for cell in row:
+		f.write(chars[cell])
+	f.write('",\n')
+f.write(']\n')
 f.close()
 
 print('%s distinct sprites' % len(sprites))
