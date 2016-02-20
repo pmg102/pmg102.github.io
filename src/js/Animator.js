@@ -1,10 +1,11 @@
 import { timestamp } from './utils';
 
 export default class Animator {
-  constructor(canvas, objects, viewport) {
+  constructor(canvas, objects, background, viewport) {
     this.sprites = objects;
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
+    this.background = background;
     this.viewport = viewport;
 
     this.fpsmeter = new FPSMeter({ decimals: 0, graph: true, theme: 'dark', left: '5px' });
@@ -12,6 +13,7 @@ export default class Animator {
 
   update(dt) {
     this.sprites.forEach(each => each.update(dt));
+    this.background.detectCollisions(this.sprites);
   }
 
   clearCanvas() {
@@ -23,6 +25,7 @@ export default class Animator {
     this.clearCanvas();
     this.ctx.save();
     this.viewport.applyTo(this.ctx);
+    this.background.render(this.ctx);
     this.sprites.forEach(each => each.render(this.ctx, this.dt));
   }
 

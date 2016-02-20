@@ -3,22 +3,30 @@ import Player from './Player';
 import Viewport from './Viewport';
 import Land from './Land';
 import Animator from './Animator';
+import Background from './Background';
+
 
 const canvas = document.getElementById('canvas');
 canvas.width = canvas.offsetWidth;
 canvas.height = canvas.offsetHeight;
 
-const player = new Player({x: 100, y: 500, width: 20, height: 20, color: '#a04'});
+const player = new Player({x: 100, y: 500, width: 32, height: 32, color: '#a04'});
 
-const viewport = new Viewport(1536, 576, player, canvas);
+const viewport = new Viewport(10000, 576, player, canvas);
 
-new Land({x: 0, y: 520, width: 1536, height: 576, color: '#4a0'});
-new Land({x: 200, y: 300, width: 100, height: 30, color: '#4a0'});
-new Land({x: 1000, y: 100, width: 100, height: 30, color: '#4a0'});
+new Land({x: 0, y: 512, width: 10000, height: 576, color: '#4a0'});
+new Land({x: 160, y: 352, width: 32, height: 32, color: '#4a0'});
+new Land({x: 32, y: 448, width: 64, height: 64, color: '#4a0'});
+new Land({x: 704, y: 352, width: 32, height: 32, color: '#4a0'});
+new Land({x: 864, y: 448, width: 64, height: 64, color: '#4a0'});
 
+const background = new Background();
 
-const animator = new Animator(canvas, Sprite.objects, viewport);
+const animator = new Animator(canvas, Sprite.objects, background, viewport);
 animator.start();
+
+// TODO:
+// * key states should be stored into a dict in onkey, dict passed to objects in update for them to respond (ie player)
 
 document.addEventListener('keydown', function(ev) { onkey(ev, ev.keyCode, true);  }, false);
 document.addEventListener('keyup',   function(ev) { onkey(ev, ev.keyCode, false); }, false);

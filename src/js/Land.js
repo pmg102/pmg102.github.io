@@ -10,4 +10,10 @@ export default class Land extends Sprite {
   		other.collideWithLand(this);
   	}
   }
+
+  render(ctx) {
+  	ctx.globalAlpha = 0.2;
+  	super.render(ctx);
+  	ctx.globalAlpha = 1;
+  }
 }

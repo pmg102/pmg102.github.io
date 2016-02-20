@@ -12,12 +12,13 @@ var _utils = require('./utils');
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Animator = function () {
-  function Animator(canvas, objects, viewport) {
+  function Animator(canvas, objects, background, viewport) {
     _classCallCheck(this, Animator);
 
     this.sprites = objects;
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
+    this.background = background;
     this.viewport = viewport;
 
     this.fpsmeter = new FPSMeter({ decimals: 0, graph: true, theme: 'dark', left: '5px' });
@@ -29,6 +30,7 @@ var Animator = function () {
       this.sprites.forEach(function (each) {
         return each.update(dt);
       });
+      this.background.detectCollisions(this.sprites);
     }
   }, {
     key: 'clearCanvas',
@@ -44,6 +46,7 @@ var Animator = function () {
       this.clearCanvas();
       this.ctx.save();
       this.viewport.applyTo(this.ctx);
+      this.background.render(this.ctx);
       this.sprites.forEach(function (each) {
         return each.render(_this.ctx, _this.dt);
       });
@@ -83,10 +86,96 @@ var Animator = function () {
 
 exports.default = Animator;
 
-},{"./utils":7}],2:[function(require,module,exports){
+},{"./utils":9}],2:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _grid = require('./grid.json');
+
+var _grid2 = _interopRequireDefault(_grid);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+/* 
+ * Read map from grid
+ * Map sprite indices against kinds of object: background, solid
+ * During Animator.update():
+   - check for collision between active objects and background by:
+     > computing grid cells player intersects
+     > checking those cells for solid objects
+     > if intersecting, move player out and reset speed*accel to 0
+ * During Animator.render():
+   - first, render correct section of background
+   - next render active objects (player, monsters, coins etc)
+ */
+
+var CHARS = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+var Background = function () {
+  function Background() {
+    var _this = this;
+
+    _classCallCheck(this, Background);
+
+    this.grid = _grid2.default;
+    this.img = new Image();
+    this.img.src = '../images/sprites.png';
+    this.img.onload = function () {
+      _this.isReady = true;
+    };
+  }
+
+  _createClass(Background, [{
+    key: 'getCell',
+    value: function getCell(y, x) {
+      if (!this.grid[y] || !this.grid[y][x]) return '0';
+
+      return CHARS.indexOf(this.grid[y][x]);
+    }
+  }, {
+    key: 'detectCollisions',
+    value: function detectCollisions(sprites) {
+      sprites.forEach(function (each) {
+        // Which cells does this sprite intersect?
+        // Are any of them solid?
+        // If so - set location to above/below and speed to 0 and accel to 0 if above
+      });
+    }
+  }, {
+    key: 'render',
+    value: function render(ctx) {
+      if (!this.isReady) return;
+      ctx.imageSmoothingEnabled = false;
+
+      for (var x = 0; x < this.grid[0].length; x++) {
+        for (var y = 0; y < this.grid.length; y++) {
+          var spriteIdx = this.getCell(y, x);
+          if (spriteIdx > 0) {
+            ctx.drawImage(this.img, 0, 8 * spriteIdx, 8, 8, x * 8 * 4, y * 8 * 4, 8 * 4, 8 * 4);
+          }
+        }
+      }
+    }
+  }]);
+
+  return Background;
+}();
+
+exports.default = Background;
+
+},{"./grid.json":7}],3:[function(require,module,exports){
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -120,6 +209,13 @@ var Land = function (_Sprite) {
         other.collideWithLand(this);
       }
     }
+  }, {
+    key: 'render',
+    value: function render(ctx) {
+      ctx.globalAlpha = 0.2;
+      _get(Object.getPrototypeOf(Land.prototype), 'render', this).call(this, ctx);
+      ctx.globalAlpha = 1;
+    }
   }]);
 
   return Land;
@@ -127,7 +223,7 @@ var Land = function (_Sprite) {
 
 exports.default = Land;
 
-},{"./Sprite":4}],3:[function(require,module,exports){
+},{"./Sprite":5}],4:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -170,7 +266,7 @@ var Player = function (_Sprite) {
 
 exports.default = Player;
 
-},{"./Sprite":4}],4:[function(require,module,exports){
+},{"./Sprite":5}],5:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -246,7 +342,7 @@ exports.default = Sprite;
 
 Sprite.objects = [];
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -313,7 +409,46 @@ var Viewport = function () {
 
 exports.default = Viewport;
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
+module.exports=[
+  "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+  "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+  "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111110000000000000000002",
+  "33333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333330000000000000000004",
+  "00000000000056567000000000000000000000000000000000005656700000000000000000000000000000000000000000000000000000005656700000000000880000000567000000000000565670000000000000000000000000000000000000000000000000000000000000000000000000005656700000000000000000000000056700000000009900000000000000abbc000de",
+  "00000000000fghghi0000000000000000000056700000000000fghghi000000000000000000000000000000j00000000000000000000000fghghi0000000000000000000fghi00000000000fghghi00000000000000000000567000000000000000000000000000000000000056700000000000fghghi00000000000000000000000fghi0000000009990j00000000000000000000d",
+  "000000000000000000000000000000000000fghi0000000000000000000000000000000000000000000k000j0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000fghi000000000000000000000000000000000000fghi000000000000000000000000000000000000000000000000000099990000000000000000000000d",
+  "00000000000000000000000000000000000000000000000000000000000000000000000000000000llllll0j0000000m00000000000000000000000000000000no00000000000000000000000000000000000000000000p0000000000000000000000000000000000000000000000000000000000000000000000000000no00000000000000no00999990j00000000000000000000d",
+  "000000000000000000000000000000000080000000000000000000000000000000000000000000000000000j000000080000000000000000000000000000008888880000000000000000000000000000000000000000008000000000000000000000000000000000000000800000000000000000000000000000000000n00o00000q000000n00o999999000000000rsst000000000d",
+  "00000000no00000000000000000000000000000000000000no000000000000000008l8l8000000uv0000000j00000000000000000000no0000000000000000n0000o0000000000000000no00000000000000000000000000000000000008l8l8000000uv0000000000000000000000000000no0000000000000000000n0000o00lll00000n00099999990j0000000www0000000000d",
+  "0000000n00o00000000000x0000000000no000000000000n00o000000000000000000000000000yz0000000j0000000000000000000n00o00000000000000n000000o00000000000000n00o0000000000000000000000no00000000000000000000000yz0000000000000no000000000000n00o00000000000000000n000000o00000000n00000joj0j00000000000000000000000d",
+  "000008n0000o000000000080000000ABn00o0000000008n0000o00000000000000000000000000yz0000000j000000000000000008n0000o000000000000n00000000o000000000008n0000o000000000080000000ABn00o0000000000000000000000yz0080000000ABn00o0000000008n0000o000000000000000n00000000o000000n0009999999990j00000000000000000000d",
+  "00000n000000o00000000000000000Cn0000o00000000n000000o00000000no0no000000000000yz00800000000000lll00000000n000000o0000000000nDDDDDDDDDDo0000000000n000000o00000000000000000Cn0000o0000no0no000000000000yz0000000000Cn0000o00000000n000000o000000000AB00n000EF00000o0000n00099999999990000000000000000000000d",
+  "00non0000AB00o0000000000000000G000990o0000non0000AB00o000000CHHHHHHHHHHHHHHHHHHH000AB00000000000000000non0000AB00o00000000n000000000000oAB0000non0000AB00o0000000000000000G000990o00CHHHHHHHHHHHHHHHHHHH0000000000G000990o0000non0000AB00o000000ABCnon0000IJK00999999n0000j0j0j999990j00000000000000000000d",
+  "0uv0o00ABC0000o000000000000uvnC0009900o00uv0o00ABC0000o00000C11111111111111111110ABC00000000000000000uv0o00ABC0000o000000n000000000000ABL0000uv0o00ABC0000o000000000000uvnC0009900o0C11111111111111111110000000uvnC0009900o00uv0o00ABC0000o00000C0G00o0000999999999990009999999999990000000000000000000000d",
+  "nyz00o0C0C00000o00000000000yz0C00099000onyz00o0C0C00000o0000C11111111111111111110C0C0000000000000000nyz00o0C0C00000o0000n0000000000000C0Co00nyz00o0C0C00000o00000000000yz0C00099000oC11111111111111111110000000yz0C00099000onyz00o0C0C00000o0000CnC000o00099999999999009999999999999o0000000000000000000002",
+  "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH1111111111111111111HHHHHHHHHMCHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHM0HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH1111111111111111111HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHM0CHHHHHHHHHHHMCHHHHHHHHHHHHHHHHH0000000000000000004",
+  "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNMCNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNM0NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNM0CNNNNNNNNNNNMCNNNNNNNNNNNNNNNNNdededededededededed",
+  "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO00000000000000000000OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
+  "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO00000000000000000000OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
+  "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOD000DDDDDDDDDDD000yzOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOD000DDDDDDDDDDDDDDyzOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
+  "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOD00000000000000000yzOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOD000D0000000000000yzOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
+  "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOD00000000000000000yzOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOD000D0000000000000yzOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
+  "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOD00000000000000000yzOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOD000Dj0j0j0j0j0jPQRzOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
+  "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOD00000000000000000yzOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOD000D00000000000STUzOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
+  "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOD00000000000000000yzOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOD000D00DDDDDDDDDDDDDOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
+  "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOD00000000000000000yzOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOD000D00000000000000DOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
+  "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOD00000jjjjjj000000yzOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOD000DD0000000000000DOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
+  "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOD00000000000000000yzOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOD0000Dj0j0j0j0j0j00DOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
+  "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOD00000jjjjjj000000yzOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOD0000D0000000000000DOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
+  "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOD00000000000000000yzOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOD0000DDDDDDDDDDDD00DOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
+  "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOD00000jjjjjj000000yzOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOD000000000000000000DOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
+  "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOD0000DDDDDDDD000PQRzOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOD0j0j0j0j0j0j0j0j0jDOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
+  "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOD0000DDDDDDDD000STUzOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOD000000000000000000DOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
+  "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOODDDDDDDDDDDDDDDDDDDDOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOODDDDDDDDDDDDDDDDDDDDOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
+]
+
+},{}],8:[function(require,module,exports){
 'use strict';
 
 var _Sprite = require('./Sprite');
@@ -336,22 +471,33 @@ var _Animator = require('./Animator');
 
 var _Animator2 = _interopRequireDefault(_Animator);
 
+var _Background = require('./Background');
+
+var _Background2 = _interopRequireDefault(_Background);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var canvas = document.getElementById('canvas');
 canvas.width = canvas.offsetWidth;
 canvas.height = canvas.offsetHeight;
 
-var player = new _Player2.default({ x: 100, y: 500, width: 20, height: 20, color: '#a04' });
+var player = new _Player2.default({ x: 100, y: 500, width: 32, height: 32, color: '#a04' });
 
-var viewport = new _Viewport2.default(1536, 576, player, canvas);
+var viewport = new _Viewport2.default(10000, 576, player, canvas);
 
-new _Land2.default({ x: 0, y: 520, width: 1536, height: 576, color: '#4a0' });
-new _Land2.default({ x: 200, y: 300, width: 100, height: 30, color: '#4a0' });
-new _Land2.default({ x: 1000, y: 100, width: 100, height: 30, color: '#4a0' });
+new _Land2.default({ x: 0, y: 512, width: 10000, height: 576, color: '#4a0' });
+new _Land2.default({ x: 160, y: 352, width: 32, height: 32, color: '#4a0' });
+new _Land2.default({ x: 32, y: 448, width: 64, height: 64, color: '#4a0' });
+new _Land2.default({ x: 704, y: 352, width: 32, height: 32, color: '#4a0' });
+new _Land2.default({ x: 864, y: 448, width: 64, height: 64, color: '#4a0' });
 
-var animator = new _Animator2.default(canvas, _Sprite2.default.objects, viewport);
+var background = new _Background2.default();
+
+var animator = new _Animator2.default(canvas, _Sprite2.default.objects, background, viewport);
 animator.start();
+
+// TODO:
+// * key states should be stored into a dict in onkey, dict passed to objects in update for them to respond (ie player)
 
 document.addEventListener('keydown', function (ev) {
   onkey(ev, ev.keyCode, true);
@@ -417,7 +563,7 @@ function onkey(ev, key, down) {
   }
 }
 
-},{"./Animator":1,"./Land":2,"./Player":3,"./Sprite":4,"./Viewport":5}],7:[function(require,module,exports){
+},{"./Animator":1,"./Background":2,"./Land":3,"./Player":4,"./Sprite":5,"./Viewport":6}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -428,4 +574,4 @@ function timestamp() {
   return window.performance && window.performance.now ? window.performance.now() : new Date().getTime();
 }
 
-},{}]},{},[6]);
+},{}]},{},[8]);
