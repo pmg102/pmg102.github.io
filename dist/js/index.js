@@ -126,7 +126,7 @@ var Background = function () {
 
     this.grid = _grid2.default;
     this.img = new Image();
-    this.img.src = '../images/sprites.png';
+    this.img.src = './images/sprites.png';
     this.img.onload = function () {
       _this.isReady = true;
     };
