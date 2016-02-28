@@ -12,8 +12,14 @@ export default class Sprite {
     this.height = cfg.height || 1;
     this.width = cfg.width || 1;
     this.lifetime = cfg.lifetime;
+    this.direction = 1;
 
     Sprite.objects.push(this);
+
+    if (cfg.src) {
+      this.img = new Image();
+      this.img.src = cfg.src;
+    }
   }
 
   _intersect(other) {
@@ -28,6 +34,8 @@ export default class Sprite {
     this.y  = this.y  + (dt * this.dy);
     this.dx = this.dx + (dt * this.ddx);
     this.dy = this.dy + (dt * this.ddy);
+    if (this.dx > 0) this.direction = 1;
+    else if (this.dx < 0) this.direction = -1;
 
     this.t += dt;
     if (this.lifetime && this.t > this.lifetime) {
@@ -43,12 +51,28 @@ export default class Sprite {
   }
 
   render(ctx) {
-    ctx.fillStyle = this.color;
-    ctx.fillRect(this.x, this.y, this.width, this.height);
+    if (!this.img) {
+      ctx.fillStyle = this.color;
+      ctx.fillRect(this.x, this.y, this.width, this.height);
+      return;
+    }
+
+    let frame = 1;
+    if (this.direction === 1) frame = 2;
+
+    if (this.dx !== 0) {
+      const step = this.dy === 0 ? parseInt(this.x / 36) % 2 : 1;
+      frame > 1 ? frame+=step : frame-=step;
+    }
+
+    ctx.drawImage(this.img,
+        12 + (frame * 30), 61, 12, 12,
+        this.x, this.y, this.width, this.height
+      );
   }
 
   collideWith(other) {
-    // Override in derived class    
+    // Override in derived class
   }
 }
 

@@ -1,6 +1,6 @@
 import grid from './grid.json';
 
-/* 
+/*
  * Read map from grid
  * Map sprite indices against kinds of object: background, solid
  * During Animator.update():
@@ -19,13 +19,13 @@ export default class Background {
   constructor() {
     this.grid = grid;
     this.img = new Image();
-    this.img.src = '../images/sprites.png';
+    this.img.src = './images/sprites.png';
     this.img.onload = () => { this.isReady = true; };
   }
 
   getCell(y, x) {
     if (!this.grid[y] || !this.grid[y][x]) return '0';
-    
+
     return CHARS.indexOf(this.grid[y][x])
   }
 

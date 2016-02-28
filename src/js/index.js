@@ -10,7 +10,7 @@ const canvas = document.getElementById('canvas');
 canvas.width = canvas.offsetWidth;
 canvas.height = canvas.offsetHeight;
 
-const player = new Player({x: 100, y: 500, width: 32, height: 32, color: '#a04'});
+const player = new Player({x: 100, y: 484, width: 48, height: 48, src: './images/mario.png'});
 
 const viewport = new Viewport(10000, 576, player, canvas);
 
