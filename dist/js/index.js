@@ -539,6 +539,12 @@ document.getElementById('right').addEventListener('mousedown', function (ev) {
 document.getElementById('right').addEventListener('mouseup', function (ev) {
   return onkey(ev, KEY.RIGHT, false);
 }, false);
+document.getElementById('jump').addEventListener('mousedown', function (ev) {
+  return onkey(ev, KEY.SPACE, true);
+}, false);
+document.getElementById('jump').addEventListener('mouseup', function (ev) {
+  return onkey(ev, KEY.SPACE, false);
+}, false);
 document.getElementById('left').addEventListener('touchstart', function (ev) {
   return onkey(ev, KEY.LEFT, true);
 }, false);
@@ -550,6 +556,12 @@ document.getElementById('right').addEventListener('touchstart', function (ev) {
 }, false);
 document.getElementById('right').addEventListener('touchend', function (ev) {
   return onkey(ev, KEY.RIGHT, false);
+}, false);
+document.getElementById('jump').addEventListener('touchstart', function (ev) {
+  return onkey(ev, KEY.SPACE, true);
+}, false);
+document.getElementById('jump').addEventListener('touchend', function (ev) {
+  return onkey(ev, KEY.SPACE, false);
 }, false);
 
 var KEY = { ENTER: 13, SPACE: 32, LEFT: 37, UP: 38, RIGHT: 39, DOWN: 40 };
