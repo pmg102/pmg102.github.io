@@ -14,11 +14,11 @@ const player = new Player({x: 100, y: 484, width: 48, height: 48, src: './images
 
 const viewport = new Viewport(10000, 576, player, canvas);
 
-new Land({x: 0, y: 512, width: 10000, height: 576, color: '#4a0'});
-new Land({x: 160, y: 352, width: 32, height: 32, color: '#4a0'});
-new Land({x: 32, y: 448, width: 64, height: 64, color: '#4a0'});
-new Land({x: 704, y: 352, width: 32, height: 32, color: '#4a0'});
-new Land({x: 864, y: 448, width: 64, height: 64, color: '#4a0'});
+// new Land({x: 0, y: 512, width: 10000, height: 576, color: '#4a0'});
+// new Land({x: 160, y: 352, width: 32, height: 32, color: '#4a0'});
+// new Land({x: 32, y: 448, width: 64, height: 64, color: '#4a0'});
+// new Land({x: 704, y: 352, width: 32, height: 32, color: '#4a0'});
+// new Land({x: 864, y: 448, width: 64, height: 64, color: '#4a0'});
 
 const background = new Background();
 

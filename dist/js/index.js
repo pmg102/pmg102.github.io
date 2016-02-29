@@ -1,11 +1,11 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _utils = require('./utils');
 
@@ -89,11 +89,11 @@ exports.default = Animator;
 },{"./utils":9}],2:[function(require,module,exports){
 'use strict';
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _grid = require('./grid.json');
 
@@ -103,7 +103,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-/*
+/* 
  * Read map from grid
  * Map sprite indices against kinds of object: background, solid
  * During Animator.update():
@@ -126,7 +126,7 @@ var Background = function () {
 
     this.grid = _grid2.default;
     this.img = new Image();
-    this.img.src = './images/sprites.png';
+    this.img.src = '../images/sprites.png';
     this.img.onload = function () {
       _this.isReady = true;
     };
@@ -173,13 +173,13 @@ exports.default = Background;
 },{"./grid.json":7}],3:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _Sprite2 = require('./Sprite');
 
@@ -226,11 +226,11 @@ exports.default = Land;
 },{"./Sprite":5}],4:[function(require,module,exports){
 'use strict';
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _Sprite2 = require('./Sprite');
 
@@ -269,11 +269,11 @@ exports.default = Player;
 },{"./Sprite":5}],5:[function(require,module,exports){
 'use strict';
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -292,14 +292,8 @@ var Sprite = function () {
     this.height = cfg.height || 1;
     this.width = cfg.width || 1;
     this.lifetime = cfg.lifetime;
-    this.direction = 1;
 
     Sprite.objects.push(this);
-
-    if (cfg.src) {
-      this.img = new Image();
-      this.img.src = cfg.src;
-    }
   }
 
   _createClass(Sprite, [{
@@ -316,7 +310,6 @@ var Sprite = function () {
       this.y = this.y + dt * this.dy;
       this.dx = this.dx + dt * this.ddx;
       this.dy = this.dy + dt * this.ddy;
-      if (this.dx > 0) this.direction = 1;else if (this.dx < 0) this.direction = -1;
 
       this.t += dt;
       if (this.lifetime && this.t > this.lifetime) {
@@ -332,26 +325,13 @@ var Sprite = function () {
   }, {
     key: 'render',
     value: function render(ctx) {
-      if (!this.img) {
-        ctx.fillStyle = this.color;
-        ctx.fillRect(this.x, this.y, this.width, this.height);
-        return;
-      }
-
-      var frame = 1;
-      if (this.direction === 1) frame = 2;
-
-      if (this.dx !== 0) {
-        var step = this.dy === 0 ? parseInt(this.x / 36) % 2 : 1;
-        frame > 1 ? frame += step : frame -= step;
-      }
-
-      ctx.drawImage(this.img, 12 + frame * 30, 61, 12, 12, this.x, this.y, this.width, this.height);
+      ctx.fillStyle = this.color;
+      ctx.fillRect(this.x, this.y, this.width, this.height);
     }
   }, {
     key: 'collideWith',
     value: function collideWith(other) {
-      // Override in derived class
+      // Override in derived class   
     }
   }]);
 
@@ -360,17 +340,16 @@ var Sprite = function () {
 
 exports.default = Sprite;
 
-
 Sprite.objects = [];
 
 },{}],6:[function(require,module,exports){
 "use strict";
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -502,7 +481,7 @@ var canvas = document.getElementById('canvas');
 canvas.width = canvas.offsetWidth;
 canvas.height = canvas.offsetHeight;
 
-var player = new _Player2.default({ x: 100, y: 484, width: 48, height: 48, src: './images/mario.png' });
+var player = new _Player2.default({ x: 100, y: 500, width: 32, height: 32, color: '#a04' });
 
 var viewport = new _Viewport2.default(10000, 576, player, canvas);
 
@@ -539,12 +518,6 @@ document.getElementById('right').addEventListener('mousedown', function (ev) {
 document.getElementById('right').addEventListener('mouseup', function (ev) {
   return onkey(ev, KEY.RIGHT, false);
 }, false);
-document.getElementById('jump').addEventListener('mousedown', function (ev) {
-  return onkey(ev, KEY.SPACE, true);
-}, false);
-document.getElementById('jump').addEventListener('mouseup', function (ev) {
-  return onkey(ev, KEY.SPACE, false);
-}, false);
 document.getElementById('left').addEventListener('touchstart', function (ev) {
   return onkey(ev, KEY.LEFT, true);
 }, false);
@@ -556,12 +529,6 @@ document.getElementById('right').addEventListener('touchstart', function (ev) {
 }, false);
 document.getElementById('right').addEventListener('touchend', function (ev) {
   return onkey(ev, KEY.RIGHT, false);
-}, false);
-document.getElementById('jump').addEventListener('touchstart', function (ev) {
-  return onkey(ev, KEY.SPACE, true);
-}, false);
-document.getElementById('jump').addEventListener('touchend', function (ev) {
-  return onkey(ev, KEY.SPACE, false);
 }, false);
 
 var KEY = { ENTER: 13, SPACE: 32, LEFT: 37, UP: 38, RIGHT: 39, DOWN: 40 };
